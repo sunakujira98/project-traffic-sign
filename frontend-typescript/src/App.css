@@ -6,6 +6,14 @@
   margin: 20px;
 } 
 
+.list-item-wrapper {
+  max-width: 800px;
+}
+
+li {
+  margin-bottom: 10px;
+}
+
 .custom-file-input::-webkit-file-upload-button {
   visibility: hidden;
 }
@@ -100,7 +108,7 @@
   cursor: pointer;
   padding: 15px;
   margin: 0px 10px;
-  background: dodgerblue;
+  background: goldenrod;
   color: white;
   border: none
 }
