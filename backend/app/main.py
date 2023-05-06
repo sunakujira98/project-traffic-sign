@@ -64,49 +64,8 @@ classes = { 1:'Speed limit (20km/h)',
             42:'End of no passing', 
             43:'End no passing veh > 3.5 tons' }
 
-# Load the pre-trained Keras model
+
 model = keras.models.load_model('traffic_classifier.h5')
-
-def get_bounding_box(img, model):
-    # Convert image to numpy array
-    img = cv2.cvtColor(numpy.array(img), cv2.COLOR_RGB2BGR)
-
-    # Convert image to grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # Apply adaptive thresholding to isolate the traffic sign
-    thresh = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
-
-    # Find contours in the thresholded image
-    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    # Loop over the contours and find the one with the largest area
-    max_area = 0
-    max_contour = None
-    for contour in contours:
-        area = cv2.contourArea(contour)
-        if area > max_area:
-            max_area = area
-            max_contour = contour
-
-    # Get the bounding box for the contour with the largest area
-    x,y,w,h = cv2.boundingRect(max_contour)
-
-    # Expand the bounding box to include some extra margin
-    margin = 10
-    x -= margin
-    y -= margin
-    w += 2 * margin
-    h += 2 * margin
-
-    # Clamp the bounding box to be within the image bounds
-    x = max(x, 0)
-    y = max(y, 0)
-    w = min(w, img.shape[1] - x)
-    h = min(h, img.shape[0] - y)
-
-    # Return the bounding box as a tuple of (left, upper, right, lower) coordinates
-    return (x, y, x + w, y + h)
 
 @app.get('/')
 async def Home():
