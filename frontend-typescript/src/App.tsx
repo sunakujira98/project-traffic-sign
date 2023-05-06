@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
-import logo from './logo.svg';
+import axios, { AxiosResponse } from 'axios';
 import './App.css';
+
+type Data = { class: string }[];
 
 function App() {
   const [selectedImage, setSelectedImage] = useState<Array<{
@@ -9,10 +11,11 @@ function App() {
   }> | null>(null)
 
   const [imageCount, setImageCount] = useState<number>(1)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [data, setData] = useState<Data | null>(null);
+  const [isError, setIsError] = useState<boolean>(false)
 
   const onImageChange = ({currentTarget: {files}}: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    console.log("index", index)
-    console.log("files", files)
     if (files && files.length) {
       const image = {
         id: index,
@@ -29,13 +32,23 @@ function App() {
         }
       });
     }
-
-    console.log("selectedImage", selectedImage)
   }
 
   const doClassification = () => {
-    // setSelectedImage(null)
-    console.log("Aaaa")
+    const formData = new FormData()
+
+    selectedImage?.forEach(image => {
+      if (image.files !== null) {
+        formData.append("files", image.files)
+      }
+    })
+
+    axios.post("http://localhost:8000/predict", formData)
+      .then((response) => {
+        setIsLoading(true)
+        setData(response.data)
+      })
+      .catch((err) => console.log(err));
   }
 
   const addImageCount = () => {
@@ -60,9 +73,9 @@ function App() {
                   className='image'
                   alt='Traffic sign image'
                 />
-                {/* <button onClick={removeSelectedImage} className='delete'>
-                  Hapus
-                </button> */}
+                {data !== null && (
+                  <span>Hasil Klasifikasi : {data?.[i]?.class === undefined ? 'Belum Dilakukan Klasifikasi' : data?.[i]?.class}</span>
+                )}
               </div>
             )}
           </div>
@@ -74,8 +87,8 @@ function App() {
       <button onClick={addImageCount} className='add'>
         Tambah
       </button>
-      <button onClick={doClassification} className='classify'>
-        Lakukan Klasifikasi
+      <button onClick={doClassification} className='classify' disabled={selectedImage?.[0] === undefined}>
+        {selectedImage?.[0] === undefined ? 'Masukkan minimal 1 gambar' : 'Lakukan Klasifikasi'}
       </button>
     </div>
     </>

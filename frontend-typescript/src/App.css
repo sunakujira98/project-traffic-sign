@@ -100,7 +100,14 @@
   cursor: pointer;
   padding: 15px;
   margin: 0px 10px;
-  background: gray;
+  background: dodgerblue;
   color: white;
   border: none
+}
+
+.classify:disabled {
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+  cursor: auto;
 }
